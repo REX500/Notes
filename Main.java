@@ -27,12 +27,43 @@ public class Main extends Application {
     BorderPane border;
     MenuBar menu;
     TextArea textArea;
+    int themeCheck=0; // 0 represents black colour while 1 presents white one
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         window = primaryStage;
         window.setTitle("Notes");
 
+        setUp();
+
+        //Making a layout boxes
+
+        HBox hbox = new HBox(5);
+        VBox vbox = new VBox(8);
+        border = new BorderPane();
+
+        vbox.getChildren().addAll(menu);
+        hbox.getChildren().addAll(vbox);
+
+        border.setTop(menu);
+        border.setCenter(textArea);
+        border.setBottom(l1);
+        border.setId("Border");
+
+        if(themeCheck == 0){
+            border.getStylesheets().add("style.css");
+        }
+        else
+         border.getStylesheets().addAll("lightStyle.css");
+        Scene scene = new Scene(border, 500,400);
+        window.setScene(scene);
+        window.show();
+    }
+
+    //method that will set up initial or startup look of the app
+
+
+    private void setUp(){
         Menu file = new Menu("File");
         Menu edit = new Menu("Edit");
         Menu help = new Menu("Help");
@@ -107,9 +138,11 @@ public class Main extends Application {
             newNote();
         });
         darkTheme.setOnAction(e->{
+            themeCheck = 0;
             border.getStylesheets().add("style.css");
         });
         lightTheme.setOnAction(e->{
+            themeCheck = 1;
             border.getStylesheets().add("lightStyle.css");
         });
         viewFull.setOnAction(e-> {
@@ -134,33 +167,6 @@ public class Main extends Application {
         fileSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN));
         viewFull.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN));
         viewExitFull.setAccelerator(new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN));
-
-
-
-        //Making a layout boxes
-
-        HBox hbox = new HBox(5);
-        VBox vbox = new VBox(8);
-        border = new BorderPane();
-
-        vbox.getChildren().addAll(menu);
-        hbox.getChildren().addAll(vbox);
-
-        border.setTop(menu);
-        border.setCenter(textArea);
-        border.setBottom(l1);
-        border.setId("Border");
-
-        border.getStylesheets().add("style.css");
-        Scene scene = new Scene(border, 500,400);
-        window.setScene(scene);
-        window.show();
-    }
-
-    //method that will set up initial or startup look of the app
-
-    private void setUp(){
-
     }
 
     public static void main(String[] args) {
@@ -214,8 +220,8 @@ public class Main extends Application {
             }
         }
         vbox = new VBox(5);
-        l1 = new Label("List of your notes: ");
-        vbox.getChildren().addAll(l1,list);
+        l2 = new Label("List of your notes: ");
+        vbox.getChildren().addAll(l2,list);
 
         b1 = new Button("Open");
         b2 = new Button("Close");
