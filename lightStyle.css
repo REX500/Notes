@@ -1,0 +1,39 @@
+.button{
+    -fx-background-color:
+            rgba(0,0,0,0.08),
+            linear-gradient(#9a9a9a, #909090),
+            linear-gradient(white 0%, #f3f3f3 50%, #ececec 51%, #f2f2f2 100%);
+    -fx-background-insets: 0 0 -1 0,0,1;
+    -fx-background-radius: 5,5,4;
+    -fx-padding: 3 30 3 30;
+    -fx-text-fill: #242d35;
+    -fx-font-size: 15px;
+}
+.label{
+    -fx-font-family: "Calibri Light";
+    -fx-font-size: 20px;
+}
+.text-area{
+    -fx-text-fill: black;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 20px;
+    -fx-prompt-text-fill: gray;
+    -fx-opacity: 0.8;
+}
+.text-area .content{
+    -fx-background-color: antiquewhite;
+}
+.menu-bar .label {
+    -fx-font-size: 10pt;
+    -fx-font-family: "Segoe UI Light";
+    -fx-text-fill: black;
+    -fx-opacity: 0.9;
+    /* if I would put a colour here it would basically colour the space around the text*/
+}
+.menu-bar{
+    -fx-background-color: whitesmoke;
+}
+/* coloring the menu items like File, Edit and Help*/
+.context-menu {
+    -fx-background-color: antiquewhite;
+}
