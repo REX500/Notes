@@ -16,6 +16,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -49,6 +52,16 @@ public class Main extends Application {
         border.setCenter(textArea);
         border.setBottom(l1);
         border.setId("Border");
+
+        Scanner scan = new Scanner(new File("settings.txt"));
+        while(scan.hasNextLine()){
+            String line = scan.nextLine();
+            Scanner token = new Scanner(line);
+            while(token.hasNext()){
+                String useless = token.next();
+                themeCheck = token.nextInt();
+            }
+        }
 
         if(themeCheck == 0){
             border.getStylesheets().add("style.css");
@@ -139,11 +152,54 @@ public class Main extends Application {
         });
         darkTheme.setOnAction(e->{
             themeCheck = 0;
+            File filePrint = new File("settings.txt");
+            PrintWriter out = null;
+            try {
+                out = new PrintWriter(filePrint);
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+            out.println("Theme= "+themeCheck);
+            out.close();
             border.getStylesheets().add("style.css");
+            String text = textArea.getText();
+            try {
+                start(window);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+            textArea.setText(text);
+            if(openNote.equals(""))
+            {
+
+            }
+            else
+                window.setTitle(openNote);
         });
         lightTheme.setOnAction(e->{
             themeCheck = 1;
+            File filePrint = new File("settings.txt");
+            PrintWriter out = null;
+            try {
+                out = new PrintWriter(filePrint);
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+            out.println("Theme= "+themeCheck);
+            out.close();
             border.getStylesheets().add("lightStyle.css");
+            String text = textArea.getText();
+            try {
+                start(window);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+            textArea.setText(text);
+            if(openNote.equals("")){
+
+            }
+            else
+                window.setTitle(openNote);
         });
         viewFull.setOnAction(e-> {
             menu.setVisible(false);
@@ -173,7 +229,7 @@ public class Main extends Application {
         launch(args);
     }
 
-    //method that saves out note
+    //method that saves our note
     PrintWriter out;
     private void saveText()throws Exception{
         TextInputDialog dialog = new TextInputDialog("");
@@ -183,8 +239,10 @@ public class Main extends Application {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> {
             try {
+                Date date = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 PrintWriter print = new PrintWriter(new FileWriter("NoteNames.txt",true));
-                print.println(name);
+                print.println(name+" "+dateFormat.format(date));
                 print.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -216,7 +274,9 @@ public class Main extends Application {
             Scanner token = new Scanner(line);
             while(token.hasNext()){
                 String name = token.next();
-                list.getItems().add(name);
+                String date = token.next();
+                String all = name+", Edited on "+date;
+                list.getItems().add(all);
             }
         }
         vbox = new VBox(5);
@@ -225,10 +285,11 @@ public class Main extends Application {
 
         b1 = new Button("Open");
         b2 = new Button("Close");
+        b3 = new Button("Delete");
 
         VBox vbox1 = new VBox(10);
         vbox1.setPadding(new Insets(30,5,5,5));
-        vbox1.getChildren().addAll(b1,b2);
+        vbox1.getChildren().addAll(b1,b3,b2);
 
         border.setRight(vbox1);
         border.setCenter(vbox);
@@ -236,10 +297,19 @@ public class Main extends Application {
         // adding a function to open a text to a b1 button
         b1.setOnAction(e->{
             String note = list.getSelectionModel().getSelectedItem();
-            note = note+".txt";
+            // now we need to cut the note so that we have only the note name not the date
+            String newNote="";
+            for(int i = 0; i < note.length(); i++){
+                if(note.charAt(i)==','){
+                    break;
+                }
+                newNote = newNote +note.charAt(i);
+            }
+
+            newNote = newNote+".txt";
             Scanner scanner = null;
             try {
-                scanner = new Scanner(new File(note));
+                scanner = new Scanner(new File(newNote));
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
             }
@@ -252,8 +322,8 @@ public class Main extends Application {
             textArea.setText(wholeText);
             border.setCenter(textArea);
             border.setRight(null);
-            window.setTitle(note);
-            openNote = note;
+            window.setTitle(newNote);
+            openNote = newNote;
         });
         b2.setOnAction(e->{
             try {
@@ -262,6 +332,24 @@ public class Main extends Application {
                 e1.printStackTrace();
             }
             openNote = "";
+        });
+        b3.setOnAction(e->{
+            if(list.getSelectionModel().getSelectedItem().isEmpty()){
+                System.out.println("jaja");
+            }
+            else {
+                String pick = list.getSelectionModel().getSelectedItem();
+                try {
+                    deleteNote(pick);
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+                try {
+                    openText();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
         });
     }
 
@@ -275,10 +363,12 @@ public class Main extends Application {
             alert.showAndWait();
         }
         else{
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             PrintWriter print = new PrintWriter(new FileWriter("NoteNames.txt",true));
             // i need to cut te last 4 chars from the openNote string
             String cutNote = openNote.substring(0, openNote.length()-4);
-            print.println(cutNote);
+            print.println(cutNote+" "+dateFormat.format(date));
             print.close();
             File file = new File(openNote);
             PrintWriter out = new PrintWriter(file);
@@ -302,5 +392,33 @@ public class Main extends Application {
         border.setCenter(textArea);
         border.setRight(null);
         textArea.setPromptText("Start typing...");
+    }
+
+    // making a method to delete the note from the list so that
+    // it cannot be opened
+
+    private void deleteNote(String noteDeleted) throws FileNotFoundException {
+        ArrayList<NoteClass> array = new ArrayList<>();
+        Scanner check = new Scanner(new File("NoteNames.txt"));
+        int i = 0;
+        while (check.hasNextLine()){
+            String line = check.nextLine();
+            Scanner token  = new Scanner(line);
+            while (token.hasNext()){
+                String name = token.next();
+                NoteClass noteClass = new NoteClass(name);
+                array.add(noteClass);
+                if(name.equals(noteDeleted)){
+                    array.remove(i);
+                }
+                i++;
+            }
+        }
+        File file = new File("NoteNames.txt");
+        PrintWriter out = new PrintWriter(file);
+        for(int j = 0; j< array.size(); j++){
+            out.println(array.get(j).getNote()+" ");
+        }
+        out.close();
     }
 }
